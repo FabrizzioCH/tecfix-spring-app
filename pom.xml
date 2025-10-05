@@ -64,6 +64,11 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+        <!-- Validación con Jakarta (para Spring Boot 3 en adelante) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
 
     </dependencies>
 

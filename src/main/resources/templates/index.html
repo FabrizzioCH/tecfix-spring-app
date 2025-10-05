@@ -1,17 +1,80 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" th:href="@{/css/output.css}">
+    <title>Tec - Fix</title>
 </head>
-<body>
-<h1 class="text-7xlt text-blue-500">Hello World!</h1>
-<nav>
-    <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="show">Show</a></li>
-    </ul>
-</nav>
+
+<body class="bg-gray-900">
+<header class="relative bg-gray-600">
+
+    <nav aria-label="Top" class=" mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="border-b border-black">
+            <div class="flex h-16 items-center">
+
+                <!-- Logo -->
+                <div class="ml-4 flex lg:ml-0">
+                    <a href="#">
+                        <span class="sr-only">Your Company</span>
+                        <img src="/img/logo.svg" alt="" class="h-8 w-auto"/>
+                    </a>
+                </div>
+
+
+                <div class="ml-auto flex items-center">
+                    <div class="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
+                        <a href="#" class="text-sm font-medium text-white hover:text-gray-500">Sign in</a>
+                        <span aria-hidden="true" class="h-6 w-px bg-gray-200"></span>
+                        <a href="#" class="text-sm font-medium text-white hover:text-gray-500">Create account</a>
+                    </div>
+
+                    <!-- Search -->
+                    <div class="flex lg:ml-6">
+                        <a href="#" class="p-2 text-white hover:text-gray-500">
+                            <span class="sr-only">Search</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                 data-slot="icon" aria-hidden="true" class="size-6">
+                                <path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                                      stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- Cart -->
+                    <div class="ml-4 flow-root lg:ml-6">
+                        <a href="#" class="group -m-2 flex items-center p-2">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                 data-slot="icon" aria-hidden="true"
+                                 class="size-6 shrink-0 text-white group-hover:text-gray-500">
+                                <path d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                                      stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span class="ml-2 text-sm font-medium text-white group-hover:text-gray-500">0</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="max-w-7xl mx-auto p-8">
+    <h1 class="text-6xl text-white">Bienvenidos a Tec-Fix</h1>
+    <section class="my-16">
+        <h2 class="text-white text-5xl">Productos y servicios</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 my-12">
+            <article th:each="producto : ${productos}"
+                     class="bg-gray-200 rounded-xl shadow-lg overflow-hidden hover:scale-105 hover:shadow-2xl
+                            transition-transform duration-300 p-4">
+                <h3 th:text="${producto.nombre}" class="text-2xl font-semibold"></h3>
+                <p th:text="${producto.descripcion}" class="mt-10"></p>
+            </article>
+        </div>
+    </section>
+</main>
 </body>
+
 </html>
