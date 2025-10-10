@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="x-head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/output.css}">
+    <title>Tec - Fix</title>
+</head>
+
+<body th:fragment="x-" class="bg-gray-900">
+<header class="relative bg-gray-600">
+
+    <nav aria-label="Top" class=" mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div>
+            <div class="flex h-16 items-center">
+
+                <!-- Logo -->
+                <div class="ml-4 flex lg:ml-0">
+                    <a href="#">
+                        <span class="sr-only">Your Company</span>
+                        <img src="/img/logo.svg" alt="" class="h-8 w-auto"/>
+                    </a>
+                </div>
+
+
+                <div class="ml-auto flex items-center">
+                    <div class="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
+                        <a href="#" class="text-sm font-medium text-white hover:text-gray-500">Sign in</a>
+                        <span aria-hidden="true" class="h-6 w-px bg-gray-200"></span>
+                        <a href="#" class="text-sm font-medium text-white hover:text-gray-500">Create account</a>
+                    </div>
+
+                    <!-- Search -->
+                    <div class="flex lg:ml-6">
+                        <a href="#" class="p-2 text-white hover:text-gray-500">
+                            <span class="sr-only">Search</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                 data-slot="icon" aria-hidden="true" class="size-6">
+                                <path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                                      stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- Cart -->
+                    <div class="ml-4 flow-root lg:ml-6">
+                        <a href="#" class="group -m-2 flex items-center p-2">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                 data-slot="icon" aria-hidden="true"
+                                 class="size-6 shrink-0 text-white group-hover:text-gray-500">
+                                <path d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                                      stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span class="ml-2 text-sm font-medium text-white group-hover:text-gray-500">0</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="max-w-7xl mx-auto p-8">
+    <h1 class="text-6xl text-white mb-2">Bienvenidos a Tec-Fix</h1>
+    <div class="flex justify-between">
+        <a th:href="@{/create}" class="text-white">Crea un producto o servicio</a>
+        <a th:href="@{/edit}" class="text-white">Edita un producto o servicio</a>
+        <a th:href="@{/show}" class="text-white">Ver un producto o servicio</a>
+        <a th:href="@{/destroy}" class="text-white">Ver un producto o servicio</a>
+    </div>
+
+    <section class="my-16 text-white">
+        <h2 class="text-white text-5xl">Productos y Servicios</h2>
+
+
+        <div class="relative overflow-x-auto mt-6">
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-6 py-3">
+                        ID
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Nombre
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Descripción
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Precio
+                    </th>
+                    <th scope="col" class="text-center">
+                        Acciones
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="producto : ${productos}"
+                    class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                    <td th:text="${producto.id}" class="px-6 py-4"></td>
+                    <td th:text="${producto.nombre}" class="px-6 py-4"></td>
+                    <td th:text="${producto.descripcion}" class="px-6 py-4"></td>
+                    <td th:text="${producto.precio}" class="px-6 py-4"></td>
+                    <td>
+                        <div class="flex space-x-3 justify-center items-center">
+                            <a th:href="@{/edit}" class="bg-amber-500 text-white rounded px-1 py-1 font-bold min-w-16 text-center">Editar</a>
+                            <a th:href="@{/show}" class="bg-blue-500 text-white rounded px-1 py-1 font-bold min-w-16 text-center">Mostrar</a>
+                            <a th:href="@{/destroy}" class="bg-red-700 text-white rounded px-1 py-1 font-bold min-w-16 text-center">Eliminar</a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+    </section>
+
+</main>
+</body>
+
+</html>
