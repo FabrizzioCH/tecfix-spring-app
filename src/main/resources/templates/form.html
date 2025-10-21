@@ -1,48 +1,48 @@
-<!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <!doctype html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="components/layout :: x-head"></head>
-<div th:replace="~{components/layout :: x-layout(~{::content})}">
-    <div th:fragment="content">
-        <h1 class="text-6xl text-white">Crea un Producto - Servicio</h1>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{components/layout}">
 
-        <div class="text-white mt-6">
-            <form th:action="@{/store}" th:object="${producto}" method="post">
-                <div class="flex flex-col gap-y-4">
-                    <div>
-                        <label for="nombre">Nombre del producto:</label>
-                        <input class="bg-gray-300 text-black"
-                               type="text" th:field="*{nombre}" />
-                    </div>
+<head>
+    <title th:text="${titulo}"></title>
+</head>
 
-                    <div>
-                        <label for="descripcion">Descripción:</label>
-                        <input class="bg-gray-300 text-black"
-                               type="text" th:field="*{descripcion}"/>
-                    </div>
-                    <div>
-                        <label for="duracionHoras">Duración (horas):</label>
-                        <input class="bg-gray-300 text-black"
-                               type="text" th:field="*{duracionHoras}"/>
-                    </div>
-                    <div>
-                        <label for="precio">Precio:</label>
-                        <input class="bg-gray-300 text-black"
-                               type="number" th:field="*{precio}"/>
-                    </div>
+<main layout:fragment="content">
+    <h1 class="text-6xl text-white" th:text="${titulo}">Crea un Producto - Servicio</h1>
 
-                    <div>
-                        <button class="bg-gray-300 text-gray-900 rounded-xl py-2 px-4 hover:cursor-pointer" type="submit">Enviar</button>
-                    </div>
+    <div class="text-white mt-6">
+        <form th:action="@{/store}" th:object="${producto}" method="post">
+            <input type="hidden" name="id" th:field="*{id}"/>
+            <div class="flex flex-col gap-y-4">
+                <div>
+                    <label for="nombre">Nombre del producto:</label>
+                    <input class="bg-gray-300 text-black"
+                           type="text" th:field="*{nombre}"/>
                 </div>
 
+                <div>
+                    <label for="descripcion">Descripción:</label>
+                    <input class="bg-gray-300 text-black"
+                           type="text" th:field="*{descripcion}"/>
+                </div>
+                <div>
+                    <label for="duracionHoras">Duración (horas):</label>
+                    <input class="bg-gray-300 text-black"
+                           type="text" th:field="*{duracionHoras}"/>
+                </div>
+                <div>
+                    <label for="precio">Precio:</label>
+                    <input class="bg-gray-300 text-black"
+                           type="number" th:field="*{precio}"/>
+                </div>
 
-
-
-            </form>
-        </div>
-
+                <div>
+                    <button class="bg-gray-300 text-gray-900 rounded-xl py-2 px-4 hover:cursor-pointer" type="submit">
+                        Enviar
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
-</div>
+</main>
 </html>

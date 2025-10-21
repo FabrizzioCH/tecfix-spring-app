@@ -1,17 +1,38 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
-<head th:fragment="x-head">
+<!--HEAD-->
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" th:href="@{/css/output.css}">
-    <title>Tec - Fix</title>
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/2.0.0/css/dataTables.dataTables.min.css">
+    <title layout:title-pattern="$CONTENT_TITLE - Tec - Fix">Tec - Fix</title>
 </head>
 
-<body th:fragment="x-layout(content)" class="bg-gray-900">
+<body class="bg-gray-900">
+
+<!--HEADER-->
 <div th:replace="fragments/header :: x-header"></div>
-<main class="max-w-7xl mx-auto p-8" th:insert="${content}"></main>
+
+<!--MAIN CONTENT-->
+<main layout:fragment="content" class="max-w-7xl mx-auto p-8"></main>
+
+<!--FOOTER-->
 <div th:replace="fragments/footer :: x-footer"></div>
+
+<!-- Scripts globales -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- JS de DataTables -->
+<script src="https://cdn.datatables.net/2.0.0/js/dataTables.min.js"></script>
+<th:block layout:fragment="scripts"></th:block>
 </body>
 
 </html>
