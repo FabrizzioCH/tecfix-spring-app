@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <header th:fragment="x-header" class="relative bg-gray-600">
 
     <nav aria-label="Top" class=" mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -12,12 +17,21 @@
                     </a>
                 </div>
 
-
-                <div class="ml-auto flex items-center">
+                <div sec:authorize="isAuthenticated()" class="ml-auto flex items-center">
                     <div class="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                        <a href="#" class="text-sm font-medium text-white hover:text-gray-500">Sign in</a>
+                        <a href="/logout" class="text-sm font-medium text-white hover:text-gray-500">Cerrar
+                            sesión</a>
                         <span aria-hidden="true" class="h-6 w-px bg-gray-200"></span>
-                        <a href="#" class="text-sm font-medium text-white hover:text-gray-500">Create account</a>
+                        <p class="text-white" th:text="${usuario}"></p>
+                    </div>
+                </div>
+
+                <div sec:authorize="isAnonymous()" class="ml-auto flex items-center">
+                    <div class="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
+                        <a href="/login" class="text-sm font-medium text-white hover:text-gray-500">Inicia sesión</a>
+                        <span aria-hidden="true" class="h-6 w-px bg-gray-200"></span>
+                        <a href="/registro" class="text-sm font-medium text-white hover:text-gray-500">Crea una
+                            cuenta</a>
                     </div>
 
                     <!-- Search -->
@@ -49,3 +63,4 @@
         </div>
     </nav>
 </header>
+</html>

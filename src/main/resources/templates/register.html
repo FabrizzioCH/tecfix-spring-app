@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{components/layout}">
+<head>
+    <title th:text="${titulo}"></title>
+
+    <!-- Fuente pixeleada -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Fuente de Tec - Fix */
+        .text-logo {
+            font-family: 'Pixelify Sans', sans-serif;
+        }
+    </style>
+</head>
+<main layout:fragment="content">
+    <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+        <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+            <img src="/img/logo.svg" alt="Your Company" class="mx-auto h-20 w-auto"/>
+            <p class="text-logo text-center text-white font-bold text-4xl">T e c - F i x</p>
+            <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">Registro</h2>
+        </div>
+
+        <!-- Formulario -->
+        <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+            <form th:action="@{/registro}" method="post" th:object="${usuario}" class="space-y-6">
+
+                <div>
+                    <label for="nombre" class="block text-sm/6 font-medium text-gray-100">Nombres</label>
+                    <div class="mt-2">
+                        <input id="nombre" name="nombre" type="text" autocomplete="nombre" th:field="*{nombre}"
+                               class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"/>
+                    </div>
+                </div>
+
+                <div class="flex gap-x-4">
+                    <div>
+                        <label for="apellido_paterno" class="block text-sm/6 font-medium text-gray-100">Apellido
+                            paterno</label>
+                        <div class="mt-2">
+                            <input id="apellido_paterno" name="apellido_paterno" type="text" th:field="*{apellidoPaterno}"
+                                   class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"/>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="apellido_materno" class="block text-sm/6 font-medium text-gray-100">Apellido
+                            materno</label>
+                        <div class="mt-2">
+                            <input id="apellido_materno" name="apellido_materno" type="text" th:field="*{apellidoMaterno}"
+                                   class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="email" class="block text-sm/6 font-medium text-gray-100">Correo electrónico</label>
+                    <div class="mt-2">
+                        <input id="email" type="email" name="email" autocomplete="email" required th:field="*{email}"
+                               class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"/>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm/6 font-medium text-gray-100">Contraseña</label>
+                    <div class="mt-2">
+                        <input id="password" type="password" name="password" autocomplete="current-password" th:field="*{password}"
+                               class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1
+                            -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2
+                            focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"/>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="confirm_password" class="block text-sm/6 font-medium text-gray-100">Confirmar
+                        contraseña</label>
+                    <div class="mt-2">
+                        <input id="confirm_password" type="password" name="confirm_password"
+                               autocomplete="current-password" class="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1
+                            -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2
+                            focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"/>
+                    </div>
+                </div>
+
+                <!-- Botón de envío -->
+                <div>
+                    <button type="submit" class="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5
+                        text-sm/6 font-semibold text-white hover:bg-indigo-400 hover:cursor-pointer focus-visible:outline-2
+                        focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Registrarse
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+</html>

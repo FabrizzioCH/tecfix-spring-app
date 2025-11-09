@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /// ## Notaciones de JPA
 @Entity // Indica que es una entidad de JPA una tabla en la base de datos
@@ -54,4 +56,7 @@ public class Producto {
     protected void OnCreate() {
         this.creadoEn = LocalDateTime.now();
     }
+
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Favorito> favoritos = new ArrayList<>();
 }

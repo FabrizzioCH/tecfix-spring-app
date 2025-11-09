@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="es"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <!--HEAD-->
 <head>
@@ -18,8 +19,9 @@
 <!--HEADER-->
 <div th:replace="fragments/header :: x-header"></div>
 
+
 <!--MAIN CONTENT-->
-<main layout:fragment="content" class="max-w-7xl mx-auto p-8"></main>
+<main layout:fragment="content" class="max-w-7xl mx-auto p-8 text-white"></main>
 
 <!--FOOTER-->
 <div th:replace="fragments/footer :: x-footer"></div>

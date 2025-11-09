@@ -1,14 +1,18 @@
 package com.tecfix.tecfix.controllers;
 
 import com.tecfix.tecfix.models.Producto;
+import com.tecfix.tecfix.models.Usuario;
+import com.tecfix.tecfix.security.CustomUserDetails;
+import com.tecfix.tecfix.security.CustomUsuarioDetailService;
 import com.tecfix.tecfix.services.ProductoService;
+import com.tecfix.tecfix.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -17,12 +21,21 @@ public class ProductoController {
     @Autowired
     private ProductoService productoService;
 
+    @Autowired
+    private UsuarioService usuarioService;
+    @Autowired
+    private CustomUsuarioDetailService customUsuarioDetailService;
+
     // Mostrar todos los productos
     @GetMapping("/")
-    public String listar(Model model) {
-        model.addAttribute("productos", productoService.listar());
-        model.addAttribute("titulo", "Inicio");
-        return "index";
+    public String home(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        if(userDetails != null){
+            model.addAttribute("usuario", userDetails.getNombre());
+        }
+            model.addAttribute("productos", productoService.listar());
+            model.addAttribute("titulo", "Inicio");
+            return "admin/index";
+
     }
 
     @GetMapping("/products/create")
@@ -63,4 +76,10 @@ public class ProductoController {
         model.addAttribute("titulo", "Producto");
         return "detalle-producto";
     }
+
+    @GetMapping("products/carrito")
+    public String showCarrito() {
+        return "carrito";
+    }
+
 }
