@@ -32,4 +32,14 @@ public class ProductoServiceImpl implements ProductoService {
     public void eliminar(Long id) {
         productoDao.deleteById(id);
     }
+
+    @Override
+    public void restarStock(Long id, int cantidad) {
+        Producto producto = buscarPorId(id);
+        if (producto != null) {
+            int nuevoStock = producto.getStock() - cantidad;
+            producto.setStock(nuevoStock);
+            guardar(producto);
+        }
+    }
 }

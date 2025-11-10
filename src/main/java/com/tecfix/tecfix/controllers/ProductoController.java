@@ -29,20 +29,23 @@ public class ProductoController {
     // Mostrar todos los productos
     @GetMapping("/")
     public String home(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
-        if(userDetails != null){
-            model.addAttribute("usuario", userDetails.getNombre());
-        }
-            model.addAttribute("productos", productoService.listar());
-            model.addAttribute("titulo", "Inicio");
-            return "admin/index";
+        model.addAttribute("productos", productoService.listar());
+        model.addAttribute("titulo", "Inicio");
 
+        if(userDetails != null) {
+            model.addAttribute("usuario", userDetails.getNombre());
+            if (userDetails.getRol().equals("admin")) {
+                return "admin/index";
+            }
+        }
+            return "index";
     }
 
     @GetMapping("/products/create")
     public String crear(Model model) {
         model.addAttribute("producto", new Producto());
         model.addAttribute("titulo", "Crear Producto");
-        return "form";
+        return "admin/form";
     }
 
     @PostMapping("/store")
@@ -59,7 +62,7 @@ public class ProductoController {
         Producto producto = productoService.buscarPorId(id);
         model.addAttribute("producto", producto);
         model.addAttribute("titulo", "Editar Producto");
-        return "form";
+        return "admin/form";
     }
 
     @PostMapping("/destroy/{id}")
@@ -80,6 +83,11 @@ public class ProductoController {
     @GetMapping("products/carrito")
     public String showCarrito() {
         return "carrito";
+    }
+
+    @GetMapping("products/lista")
+    public String showProdcts() {
+        return "lista-productos";
     }
 
 }

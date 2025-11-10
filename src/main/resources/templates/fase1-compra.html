@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{components/layout}">
+<head>
+    <title th:text="${titulo}"></title>
+</head>
+<main layout:fragment="content">
+    <h1 class="text-6xl text-white mb-6">Compra</h1>
+
+    <!-- Formulario de dirección y método de pago -->
+    <form method="post" class="space-y-8 max-w-3xl" id="checkoutForm" th:action="@{/compra/procesar}">
+        <!-- CSRF (si está habilitado en Spring Security) -->
+        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+        <!-- Dirección de envío -->
+        <fieldset class="border border-gray-700 p-6 rounded-md bg-gray-800/40">
+            <legend class="text-xl font-semibold text-white px-2">Dirección de envío</legend>
+
+            <!-- Selección de direcciones guardadas -->
+            <div class="space-y-3 mt-4">
+                <p class="text-sm text-gray-300" th:if="${direcciones == null || #lists.isEmpty(direcciones)}">No tienes
+                    direcciones guardadas. Agrega una nueva:</p>
+                <div th:if="${direcciones != null && !#lists.isEmpty(direcciones)}" class="space-y-2">
+
+                    <p class="text-sm text-gray-300">Selecciona una dirección guardada o crea una nueva:</p>
+                    <div class="space-y-2">
+                        <label th:each="dir, iter : ${direcciones}"
+                               class="flex items-start gap-2 p-3 rounded-md bg-gray-900 border border-gray-600 cursor-pointer text-gray-200">
+                            <input type="radio" name="direccionSeleccion" th:value="${dir.id}"
+                                   th:checked="${iter.index == 0}" class="mt-1 accent-blue-500 direccion-option"/>
+                            <span class="text-sm"
+                                  th:text="${dir.alias + ' - ' + dir.calle + ' ' + dir.numero + ', ' + dir.ciudad}"></span>
+                        </label>
+                        <label class="flex items-start gap-2 p-3 rounded-md bg-gray-900 border border-dashed border-gray-600 cursor-pointer text-gray-200">
+                            <input type="radio" name="direccionSeleccion" value="nueva"
+                                   class="mt-1 accent-blue-500 direccion-option"/>
+                            <span class="text-sm">Nueva dirección</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario nueva dirección -->
+            <div id="nuevaDireccionFields" class="grid md:grid-cols-2 gap-4 mt-4"
+                 th:classappend="${direcciones != null && !#lists.isEmpty(direcciones)} ? 'hidden' : ''">
+                <div class="md:col-span-2">
+                    <label class="block text-sm text-gray-300 mb-1" for="calle">Calle</label>
+                    <input required name="calle" id="calle" type="text"
+                           class="w-full rounded-md bg-gray-900 border border-gray-600 text-white px-3 py-2"/>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1" for="ciudad">Ciudad</label>
+                    <input required name="ciudad" id="ciudad" type="text"
+                           class="w-full rounded-md bg-gray-900 border border-gray-600 text-white px-3 py-2"/>
+                    <p class="mt-1 text-xs text-red-400"></p>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1" for="provincia">Provincia / Estado</label>
+                    <input required name="provincia" id="provincia" type="text"
+                           class="w-full rounded-md bg-gray-900 border border-gray-600 text-white px-3 py-2"/>
+                    <p class="mt-1 text-xs text-red-400"></p>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1" for="cp">Código Postal</label>
+                    <input required name="cp" id="cp" type="text" pattern="[0-9A-Za-z\-]{3,10}"
+                           class="w-full rounded-md bg-gray-900 border border-gray-600 text-white px-3 py-2"/>
+                    <p class="mt-1 text-xs text-red-400"></p>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1" for="numero">Número</label>
+                    <input required name="numero" id="numero" type="text"
+                           class="w-full rounded-md bg-gray-900 border border-gray-600 text-white px-3 py-2"/>
+                    <p class="mt-1 text-xs text-red-400"></p>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-300 mb-1" for="alias">Alias</label>
+                    <input required name="alias" id="alias" type="text"
+                           class="w-full rounded-md bg-gray-900 border border-gray-600 text-white px-3 py-2"/>
+                    <p class="mt-1 text-xs text-red-400"></p>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="flex items-center gap-2 text-sm text-gray-300 mb-1" for="referencia">Referencia <span
+                            class="text-xs text-gray-500">(opcional)</span></label>
+                    <textarea name="referencia" id="referencia" rows="3"
+                              class="w-full rounded-md bg-gray-900 border border-gray-600 text-white px-3 py-2"
+                              placeholder="Instrucciones para el reparto, horario, etc."></textarea>
+                    <p class="mt-1 text-xs text-red-400"></p>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- Método de pago -->
+        <fieldset class="border border-gray-700 p-6 rounded-md bg-gray-800/40">
+            <legend class="text-xl font-semibold text-white px-2">Método de pago</legend>
+
+            <!-- Selección de métodos de pago guardados -->
+            <div class="space-y-3 mt-4">
+                <p class="text-sm text-gray-300" th:if="${metodosPago == null || #lists.isEmpty(metodosPago)}">No tienes
+                    métodos de pago guardados. Agrega uno nuevo:</p>
+                <div th:if="${metodosPago != null && !#lists.isEmpty(metodosPago)}" class="space-y-2">
+                    <p class="text-sm text-gray-300">Selecciona un método guardado o crea uno nuevo:</p>
+                    <div class="space-y-2">
+                        <label th:each="mp, iter : ${metodosPago}"
+                               class="flex items-start gap-2 p-3 rounded-md bg-gray-900 border border-gray-600 cursor-pointer text-gray-200">
+                            <input type="radio" name="metodoPagoSeleccion" th:value="${mp.id}"
+                                   th:checked="${iter.index == 0}" class="mt-1 accent-blue-500 metodo-pago-option"/>
+                            <span class="text-sm" th:text="${mp.tipo + ' •••• ' + mp.numeroCuenta}"></span>
+                        </label>
+                        <label class="flex items-start gap-2 p-3 rounded-md bg-gray-900 border border-dashed border-gray-600 cursor-pointer text-gray-200">
+                            <input type="radio" name="metodoPagoSeleccion" value="nuevo"
+                                   class="mt-1 accent-blue-500 metodo-pago-option"/>
+                            <span class="text-sm">Nuevo método de pago</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario nuevo método -->
+            <div id="nuevoMetodoPagoFields" class="mt-4 space-y-4"
+                 th:classappend="${metodosPago != null && !#lists.isEmpty(metodosPago)} ? 'hidden' : ''">
+                <div class="grid md:grid-cols-3 gap-4">
+                    <label class="flex items-center gap-2 cursor-pointer bg-gray-900 border border-gray-600 rounded-md p-3 text-gray-200">
+                        <input type="radio" name="tipoTarjeta" value="CREDITO" class="accent-blue-500"/>
+                        <span>Tarjeta de crédito</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer bg-gray-900 border border-gray-600 rounded-md p-3 text-gray-200">
+                        <input type="radio" name="tipoTarjeta" value="DEBITO" class="accent-blue-500"/>
+                        <span>Tarjeta de débito</span>
+                    </label>
+                </div>
+
+                <!-- Datos tarjeta -->
+                <div id="tarjetaFields" class="grid md:grid-cols-2 gap-4 pt-4 border-t border-gray-700">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm text-gray-300 mb-1" for="numTarjeta">Número de tarjeta</label>
+                        <input name="numTarjeta" id="numTarjeta" inputmode="numeric" autocomplete="cc-number"
+                               pattern="[0-9]{13,19}" maxlength="19"
+                               class="w-full rounded-md bg-gray-900 border border-gray-600 text-white px-3 py-2 tracking-widest"
+                               placeholder="•••• •••• •••• ••••"/>
+                        <p class="mt-1 text-xs text-red-400"></p>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-300 mb-1" for="nombreTarjeta">Nombre en la tarjeta</label>
+                        <input name="nombreTarjeta" id="nombreTarjeta" type="text" autocomplete="cc-name"
+                               class="w-full rounded-md bg-gray-900 border border-gray-600 text-white px-3 py-2"/>
+                        <p class="mt-1 text-xs text-red-400"></p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <label class="block text-sm text-gray-300 mb-1" for="expiracion">Fecha expiración</label>
+                            <input name="expiracion" id="expiracion" type="text" pattern="(0[1-9]|1[0-2])/(\d{2})"
+                                   placeholder="MM/AA" autocomplete="cc-exp"
+                                   class="w-full rounded-md bg-gray-900 border border-gray-600 text-white px-3 py-2"/>
+                            <p class="mt-1 text-xs text-red-400"></p>
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-sm text-gray-300 mb-1" for="cvv">CVV</label>
+                            <input name="cvv" id="cvv" type="password" pattern="[0-9]{3,4}" maxlength="4"
+                                   autocomplete="cc-csc"
+                                   class="w-full rounded-md bg-gray-900 border border-gray-600 text-white px-3 py-2"
+                                   placeholder="•••"/>
+                            <p class="mt-1 text-xs text-red-400"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="text-white text-xl font-semibold">
+            Total a pagar: <span th:text="${total} + ' $'">0.00</span>
+        </div>
+
+        <!-- Botón continuar -->
+        <div class="pt-2 flex mt-6">
+            <button type="submit"
+                    class="px-6 py-3 rounded-md bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-gray-900">
+                Pagar
+            </button>
+        </div>
+    </form>
+
+    <script>
+        (function () {
+            const direccionOptions = document.querySelectorAll('.direccion-option');
+            const nuevaDirFields = document.getElementById('nuevaDireccionFields');
+            const dirRequired = ['calle', 'ciudad', 'provincia', 'cp', 'numero', 'alias'];
+
+            function toggleDireccion() {
+                const selected = document.querySelector('input[name="direccionSeleccion"]:checked');
+                const isNew = selected ? selected.value === 'nueva' : !nuevaDirFields.classList.contains('hidden');
+                nuevaDirFields.classList.toggle('hidden', !isNew);
+                dirRequired.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        if (isNew) {
+                            el.setAttribute('required', 'required');
+                        } else {
+                            el.removeAttribute('required');
+                        }
+                    }
+                });
+            }
+
+            direccionOptions.forEach(opt => opt.addEventListener('change', toggleDireccion));
+
+            const metodoOptions = document.querySelectorAll('.metodo-pago-option');
+            const nuevoMetodoFields = document.getElementById('nuevoMetodoPagoFields');
+            const metodoRequired = ['numTarjeta', 'nombreTarjeta', 'expiracion', 'cvv'];
+
+            function toggleMetodo() {
+                const selected = document.querySelector('input[name="metodoPagoSeleccion"]:checked');
+                const isNew = selected ? selected.value === 'nuevo' : !nuevoMetodoFields.classList.contains('hidden');
+                nuevoMetodoFields.classList.toggle('hidden', !isNew);
+                metodoRequired.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        if (isNew) {
+                            el.setAttribute('required', 'required');
+                        } else {
+                            el.removeAttribute('required');
+                        }
+                    }
+                });
+                // Toggle required for card type group
+                document.querySelectorAll('input[name="tipoTarjeta"]').forEach(r => {
+                    if (isNew) {
+                        r.setAttribute('required', 'required');
+                    } else {
+                        r.removeAttribute('required');
+                    }
+                });
+            }
+
+            metodoOptions.forEach(opt => opt.addEventListener('change', toggleMetodo));
+
+            // Intercept submit: por ahora solo permitimos seleccionar existentes
+            const form = document.getElementById('checkoutForm');
+            form.addEventListener('submit', function (e) {
+                const dirSel = document.querySelector('input[name="direccionSeleccion"]:checked');
+                const mpSel = document.querySelector('input[name="metodoPagoSeleccion"]:checked');
+                const invalid = !dirSel || isNaN(Number(dirSel.value)) || !mpSel || isNaN(Number(mpSel.value));
+                if (invalid) {
+                    e.preventDefault();
+                    alert('Por ahora debes seleccionar una dirección y un método de pago guardados.');
+                }
+            });
+
+            // Initialize state on load
+            toggleDireccion();
+            toggleMetodo();
+        })();
+    </script>
+</main>
+</html>

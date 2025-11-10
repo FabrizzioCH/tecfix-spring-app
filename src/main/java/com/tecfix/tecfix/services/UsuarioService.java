@@ -7,4 +7,5 @@ import java.util.Optional;
 public interface UsuarioService {
     void guardar(Usuario usuario);
     Usuario buscarUsuarioPorEmail(String email);
+    Usuario buscarUsuarioId(Long id);
 }

@@ -8,6 +8,40 @@
 <main layout:fragment="content">
     <h1 class="text-6xl text-white mb-2">Bienvenidos a Tec-Fix</h1>
 
-</main>
+    <div>
+        <div class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+            <h2 class="sr-only">Productos</h2>
 
+            <div class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+                <article th:each="producto : ${productos}"
+                         class="group rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow p-4 flex flex-col items-center">
+                    <!-- Link solo para detalle -->
+                    <a th:href="@{/products/show/{id}(id=${producto.id})}" class="w-full">
+                        <img th:src="${producto.imagenUrl}" alt="imagen"
+                             class="aspect-square w-full rounded-md bg-gray-100 object-cover group-hover:opacity-90 transition-opacity"/>
+                        <h3 class="mt-4 text-base font-medium text-gray-700 text-center" th:text="${producto.nombre}"></h3>
+                        <p class="mt-1 text-lg font-semibold text-gray-500 text-center" th:text="${producto.precio}"></p>
+                    </a>
+
+                    <div class="mt-4 flex gap-2 w-full">
+                        <form th:action="@{/carrito/add/{id}(id=${producto.id})}" method="post" class="flex-1">
+                            <button type="submit"
+                                    class="w-full rounded-md bg-indigo-100 px-2 py-1 text-sm text-indigo-700 hover:bg-indigo-200 transition-colors border border-indigo-100">
+                                Agregar al carrito
+                            </button>
+                        </form>
+
+                        <form th:action="@{'/products/add-favorito/' + ${producto.id}}" method="post" class="flex-1">
+                            <button type="submit"
+                                    class="w-full rounded-md bg-yellow-100 px-2 py-1 text-sm text-yellow-700 hover:bg-yellow-200 transition-colors border border-yellow-100">
+                                Agregar a favoritos
+                            </button>
+                        </form>
+                    </div>
+                </article>
+
+            </div>
+        </div>
+    </div>
+</main>
 </html>

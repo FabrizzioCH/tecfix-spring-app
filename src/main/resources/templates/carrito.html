@@ -7,170 +7,57 @@
 </head>
 <main layout:fragment="content">
     <h1 class="text-6xl text-white mb-2">Carrito de compra</h1>
-    <button command="show-modal" commandfor="drawer"
-            class="rounded-md bg-gray-950/5 px-2.5 py-1.5 text-sm font-semibold text-gray-900 hover:bg-gray-950/10">Open
-        drawer
-    </button>
-    <el-dialog>
-        <dialog id="drawer" aria-labelledby="drawer-title"
-                class="fixed inset-0 size-auto max-h-none max-w-none overflow-hidden bg-transparent not-open:hidden backdrop:bg-transparent">
-            <el-dialog-backdrop
-                    class="absolute inset-0 bg-gray-500/75 transition-opacity duration-500 ease-in-out data-closed:opacity-0"></el-dialog-backdrop>
 
-            <div tabindex="0" class="absolute inset-0 pl-10 focus:outline-none sm:pl-16">
-                <el-dialog-panel
-                        class="ml-auto block size-full max-w-md transform transition duration-500 ease-in-out data-closed:translate-x-full sm:duration-700">
-                    <div class="flex h-full flex-col overflow-y-auto bg-white shadow-xl">
-                        <div class="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
-                            <div class="flex items-start justify-between">
-                                <h2 id="drawer-title" class="text-lg font-medium text-gray-900">Shopping cart</h2>
-                                <div class="ml-3 flex h-7 items-center">
-                                    <button type="button" command="close" commandfor="drawer"
-                                            class="relative -m-2 p-2 text-gray-400 hover:text-gray-500">
-                                        <span class="absolute -inset-0.5"></span>
-                                        <span class="sr-only">Close panel</span>
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                                             data-slot="icon" aria-hidden="true" class="size-6">
-                                            <path d="M6 18 18 6M6 6l12 12" stroke-linecap="round"
-                                                  stroke-linejoin="round"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
+    <div id="items" class="mt-12 space-y-4">
+        <!-- Mensaje cuando no hay items -->
+        <div th:if="${items == null || #lists.isEmpty(items)}" class="text-white">Tu carrito está vacío.</div>
 
-                            <div class="mt-8">
-                                <div class="flow-root">
-                                    <ul role="list" class="-my-6 divide-y divide-gray-200">
-                                        <li class="flex py-6">
-                                            <div
-                                                    class="size-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                                <img src="https://tailwindcss.com/plus-assets/img/ecommerce-images/shopping-cart-page-04-product-01.jpg"
-                                                     alt="Salmon orange fabric pouch with match zipper, gray zipper pull, and adjustable hip belt."
-                                                     class="size-full object-cover"/>
-                                            </div>
-
-                                            <div class="ml-4 flex flex-1 flex-col">
-                                                <div>
-                                                    <div
-                                                            class="flex justify-between text-base font-medium text-gray-900">
-                                                        <h3>
-                                                            <a href="#">Throwback Hip Bag</a>
-                                                        </h3>
-                                                        <p class="ml-4">$90.00</p>
-                                                    </div>
-                                                    <p class="mt-1 text-sm text-gray-500">Salmon</p>
-                                                </div>
-                                                <div class="flex flex-1 items-end justify-between text-sm">
-                                                    <p class="text-gray-500">Qty 1</p>
-
-                                                    <div class="flex">
-                                                        <button type="button"
-                                                                class="font-medium text-indigo-600 hover:text-indigo-500">
-                                                            Remove
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="flex py-6">
-                                            <div
-                                                    class="size-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                                <img src="https://tailwindcss.com/plus-assets/img/ecommerce-images/shopping-cart-page-04-product-02.jpg"
-                                                     alt="Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch."
-                                                     class="size-full object-cover"/>
-                                            </div>
-
-                                            <div class="ml-4 flex flex-1 flex-col">
-                                                <div>
-                                                    <div
-                                                            class="flex justify-between text-base font-medium text-gray-900">
-                                                        <h3>
-                                                            <a href="#">Medium Stuff Satchel</a>
-                                                        </h3>
-                                                        <p class="ml-4">$32.00</p>
-                                                    </div>
-                                                    <p class="mt-1 text-sm text-gray-500">Blue</p>
-                                                </div>
-                                                <div class="flex flex-1 items-end justify-between text-sm">
-                                                    <p class="text-gray-500">Qty 1</p>
-
-                                                    <div class="flex">
-                                                        <button type="button"
-                                                                class="font-medium text-indigo-600 hover:text-indigo-500">
-                                                            Remove
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="flex py-6">
-                                            <div
-                                                    class="size-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                                <img src="https://tailwindcss.com/plus-assets/img/ecommerce-images/shopping-cart-page-04-product-03.jpg"
-                                                     alt="Front of zip tote bag with white canvas, black canvas straps and handle, and black zipper pulls."
-                                                     class="size-full object-cover"/>
-                                            </div>
-
-                                            <div class="ml-4 flex flex-1 flex-col">
-                                                <div>
-                                                    <div
-                                                            class="flex justify-between text-base font-medium text-gray-900">
-                                                        <h3>
-                                                            <a href="#">Zip Tote Basket</a>
-                                                        </h3>
-                                                        <p class="ml-4">$140.00</p>
-                                                    </div>
-                                                    <p class="mt-1 text-sm text-gray-500">White and black</p>
-                                                </div>
-                                                <div class="flex flex-1 items-end justify-between text-sm">
-                                                    <p class="text-gray-500">Qty 1</p>
-
-                                                    <div class="flex">
-                                                        <button type="button"
-                                                                class="font-medium text-indigo-600 hover:text-indigo-500">
-                                                            Remove
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="border-t border-gray-200 px-4 py-6 sm:px-6">
-                            <div class="flex justify-between text-base font-medium text-gray-900">
-                                <p>Subtotal</p>
-                                <p>$262.00</p>
-                            </div>
-                            <p class="mt-0.5 text-sm text-gray-500">Shipping and taxes calculated at checkout.</p>
-                            <div class="mt-6">
-                                <a href="#"
-                                   class="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-xs hover:bg-indigo-700">Checkout</a>
-                            </div>
-                            <div class="mt-6 flex justify-center text-center text-sm text-gray-500">
-                                <p>
-                                    or
-                                    <button type="button" command="close" commandfor="drawer"
-                                            class="font-medium text-indigo-600 hover:text-indigo-500">
-                                        Continue Shopping
-                                        <span aria-hidden="true"> &rarr;</span>
-                                    </button>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </el-dialog-panel>
+        <!-- Lista de items del carrito -->
+        <div th:each="item : ${items}"
+             class="flex gap-4 items-start p-4 rounded-lg bg-gray-800/40 border border-gray-700">
+            <!-- Imagen -->
+            <div class="size-40 bg-gray-700 flex items-center justify-center rounded-md overflow-hidden">
+                <img th:if="${item.producto.imagenUrl}" th:src="${item.producto.imagenUrl}" alt="imagen del producto"
+                     class="object-cover w-full h-full"/>
+                <span th:if="${item.producto.imagenUrl == null}" class="text-xs text-gray-300">Sin imagen</span>
             </div>
-        </dialog>
-    </el-dialog>
+
+            <!-- Info -->
+            <div class="flex-1 text-white">
+                <h2 class="text-xl font-semibold" th:text="${item.producto.nombre}"></h2>
+                <p class="mt-1 text-sm text-gray-300" th:text="${item.producto.descripcion}"></p>
+                <p class="mt-2 font-medium" th:text="'$' + ${item.producto.precio}"></p>
+            </div>
+
+            <!-- Cantidad y acciones -->
+            <div class="flex flex-col items-center gap-2">
+                <form th:action="@{/carrito/update/{productoId}(productoId=${item.producto.id})}" method="post"
+                      class="flex flex-col items-center gap-2">
+                    <label class="text-xs text-gray-300" for="cantidad-[[${item.producto.id}]]">Cantidad</label>
+                    <input id="cantidad-[[${item.producto.id}]]" name="cantidad" type="number" min="1" required
+                           th:value="${item.cantidad}"
+                           class="w-20 rounded-md bg-gray-700 text-white text-center py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+                    <button type="submit"
+                            class="text-xs px-3 py-1 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white">Actualizar
+                    </button>
+                </form>
+                <form th:action="@{/carrito/delete/{productoId}(productoId=${item.producto.id})}" method="post">
+                    <button type="submit" class="text-xs px-3 py-1 rounded-md bg-red-600 hover:bg-red-500 text-white">
+                        Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 space-y-4">
+        <h2 class="text-2xl text-white">Total: <span th:text="'$' + ${total}"></span></h2>
+    </div>
+
+    <div class="mt-4 flex items-center justify-center">
+        <a href="/compra/fase1" class="bg-green-500 py-2 px-6 rounded-lg">Siguiente</a>
+    </div>
 
 </main>
-
-<th:block layout:fragment="scripts">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
-</th:block>
-
 
 </html>

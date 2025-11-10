@@ -23,5 +23,10 @@ public class UsusarioServiceImpl implements UsuarioService {
         return usuarioDao.findByEmail(email).orElse(null);
     }
 
+    @Override
+    public Usuario buscarUsuarioId(Long id) {
+        return usuarioDao.findById(id).orElse(null);
+    }
+
 
 }

@@ -37,7 +37,7 @@
                     <th scope="col" class="px-6 py-3">
                         Precio
                     </th>
-                    <th scope="col" class="text-center">
+                    <th scope="col" class="px-6 py-3">
                         Acciones
                     </th>
                 </tr>
@@ -50,7 +50,7 @@
                     <td th:text="${producto.descripcion}" class="px-6 py-4"></td>
                     <td th:text="${producto.precio}" class="px-6 py-4"></td>
                     <td>
-                        <div class="flex space-x-3 justify-center items-center px-3">
+                        <div class="flex space-x-3  items-center">
                             <a th:href="@{'/products/edit/' + ${producto.id}}"
                                class="bg-amber-500 text-white rounded px-1 py-1 font-bold min-w-16 text-center">Editar</a>
                             <a th:href="@{'/products/show/' + ${producto.id}}"

@@ -9,4 +9,5 @@ public interface ProductoService {
     void guardar(Producto producto);
     Producto buscarPorId(Long id);
     void eliminar(Long id);
+    void restarStock(Long id, int cantidad);
 }

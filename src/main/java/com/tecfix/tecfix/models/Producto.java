@@ -26,7 +26,8 @@ import java.util.List;
 public class Producto {
 
     @Id // Indica que es la llave primaria
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Indica que es la llave primaria y que se genera automaticamente
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // Indica que es la llave primaria y que se genera automaticamente
     private Long id;
 
     @NotBlank // Validador de Jakarta, no permite nulos ni cadenas vacías
@@ -52,6 +53,11 @@ public class Producto {
     @Column(name = "creado_en", updatable = false)
     private LocalDateTime creadoEn;
 
+    @Column
+    private String imagenUrl;
+
+    private int stock;
+
     @PrePersist // Ejecuta el metodo antes de insertar el registro en la base de datos
     protected void OnCreate() {
         this.creadoEn = LocalDateTime.now();
@@ -59,4 +65,10 @@ public class Producto {
 
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorito> favoritos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CarritoItems> carritoItems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CompraDetalle> compraDetalles = new ArrayList<>();
 }

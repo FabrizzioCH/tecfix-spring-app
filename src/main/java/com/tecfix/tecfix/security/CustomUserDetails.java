@@ -34,6 +34,10 @@ public class CustomUserDetails implements UserDetails {
         return usuario.getNombre();
     }
 
+    public String getRol() {
+        return usuario.getRol();
+    }
+
     @Override
     public String getUsername() {
         return usuario.getEmail();
