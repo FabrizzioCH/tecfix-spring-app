@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{components/layout}">
+<head>
+    <title th:text="${titulo}"></title>
+</head>
+<main layout:fragment="content">
+    <h1 class="text-6xl text-white mb-2">Bienvenidos a Tec-Fix</h1>
+
+    <section class="my-16 text-white">
+        <h2 class="text-white text-5xl">Estadísticas</h2>
+        <div class="flex items-center justify-center">
+            <div id="chart_div" class="mt-8"></div>
+        </div>
+
+
+    </section>
+
+</main>
+
+<th:block layout:fragment="scripts">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+
+        // Load the Visualization API and the corechart package.
+        google.charts.load('current', {'packages':['corechart']});
+
+        // Set a callback to run when the Google Visualization API is loaded.
+        google.charts.setOnLoadCallback(drawChart);
+
+        // Callback that creates and populates a data table,
+        // instantiates the pie chart, passes in the data and
+        // draws it.
+        function drawChart() {
+
+            // Create the data table.
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Topping');
+            data.addColumn('number', 'Slices');
+            data.addRows([
+                ['Mushrooms', 3],
+                ['Onions', 1],
+                ['Olives', 1],
+                ['Zucchini', 1],
+                ['Pepperoni', 2]
+            ]);
+
+            // Set chart options
+            var options = {'title':'How Much Pizza I Ate Last Night',
+                'width':400,
+                'height':300};
+
+            // Instantiate and draw our chart, passing in some options.
+            var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
+        }
+    </script>
+</th:block>
+
+<th:block layout:fragment="styles">
+    <style>
+        .buttons-excel {
+            background-color: green !important;
+            color: white !important;
+            border: none !important;
+            padding: 8px 14px !important;
+            border-radius: 8px !important;
+            font-size: 14px !important;
+        }
+
+        .buttons-pdf {
+            background-color: red !important;
+            color: white !important;
+            border: none !important;
+            padding: 8px 14px !important;
+            border-radius: 8px !important;
+            font-size: 14px !important;
+        }
+    </style>
+</th:block>
+</html>

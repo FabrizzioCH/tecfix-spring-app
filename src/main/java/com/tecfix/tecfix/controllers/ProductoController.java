@@ -1,7 +1,6 @@
 package com.tecfix.tecfix.controllers;
 
 import com.tecfix.tecfix.models.Producto;
-import com.tecfix.tecfix.models.Usuario;
 import com.tecfix.tecfix.security.CustomUserDetails;
 import com.tecfix.tecfix.security.CustomUsuarioDetailService;
 import com.tecfix.tecfix.services.ProductoService;
@@ -13,7 +12,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 
 @Controller
 public class ProductoController {
@@ -49,7 +58,25 @@ public class ProductoController {
     }
 
     @PostMapping("/store")
-    public String guardar(Producto producto, RedirectAttributes flash) {
+    public String guardar(Producto producto, RedirectAttributes flash,
+    @RequestParam("imagenFile") MultipartFile file
+    ) throws IOException {
+        if (!file.isEmpty()) {
+            String folder = "src/main/resources/static/img/products/";
+
+            File directory = new File(folder);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path path = Paths.get(folder + filename);
+
+            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+
+            producto.setImagenUrl("/img/products/" + filename);
+        }
+
         var id = producto.getId();
         productoService.guardar(producto);
         var accion = (id != null) ? "modificado" : "registrado";
@@ -63,6 +90,11 @@ public class ProductoController {
         model.addAttribute("producto", producto);
         model.addAttribute("titulo", "Editar Producto");
         return "admin/form";
+    }
+
+    @GetMapping("products/charts")
+    public String showChart(){
+        return "admin/charts";
     }
 
     @PostMapping("/destroy/{id}")

@@ -11,7 +11,7 @@
     <h1 class="text-6xl text-white" th:text="${titulo}">Crea un Producto - Servicio</h1>
 
     <div class="text-white mt-6">
-        <form th:action="@{/store}" th:object="${producto}" method="post">
+        <form th:action="@{/store}" th:object="${producto}" method="post" enctype="multipart/form-data">
             <input type="hidden" name="id" th:field="*{id}"/>
             <div class="flex flex-col gap-y-4">
                 <div>
@@ -25,15 +25,16 @@
                     <input class="bg-gray-300 text-black"
                            type="text" th:field="*{descripcion}"/>
                 </div>
-                <div>
-                    <label for="duracionHoras">Duración (horas):</label>
-                    <input class="bg-gray-300 text-black"
-                           type="text" th:field="*{duracionHoras}"/>
-                </div>
+
                 <div>
                     <label for="precio">Precio:</label>
                     <input class="bg-gray-300 text-black"
                            type="number" th:field="*{precio}"/>
+                </div>
+                <div>
+                    <label for="imagenFile">Imagen:</label>
+                    <input class="bg-gray-300 text-black"
+                           type="file" name="imagenFile" id="imagenFile"/>
                 </div>
 
                 <div>
