@@ -11,7 +11,10 @@
     <link rel="stylesheet" th:href="@{/css/output.css}">
     <link rel="stylesheet"
           href="https://cdn.datatables.net/2.0.0/css/dataTables.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.5/css/buttons.dataTables.min.css">
     <title layout:title-pattern="$CONTENT_TITLE - TecFix">TecFix</title>
+
+    <th:block layout:fragment="styles"></th:block>
 </head>
 
 <body class="bg-gray-900">
@@ -34,6 +37,18 @@
 
 <!-- JS de DataTables -->
 <script src="https://cdn.datatables.net/2.0.0/js/dataTables.min.js"></script>
+
+<script src="https://cdn.datatables.net/buttons/3.2.5/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.5/js/buttons.colVis.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.5/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.5/js/buttons.print.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.7/build/pdfmake.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.7/build/vfs_fonts.js"></script>
+
+
 <th:block layout:fragment="scripts"></th:block>
 </body>
 

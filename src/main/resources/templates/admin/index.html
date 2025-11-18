@@ -22,7 +22,8 @@
 
 
         <div class="relative overflow-x-auto mt-6">
-            <table id="productosTabla" class="display w-full text-sm text-left rtl:text-right text-gray-900 bg-gray-100">
+            <table id="productosTabla"
+                   class="display w-full text-sm text-left rtl:text-right text-gray-900 bg-gray-100">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                 <tr>
                     <th scope="col" class="px-6 py-3">
@@ -38,7 +39,10 @@
                         Precio
                     </th>
                     <th scope="col" class="px-6 py-3">
-                        Acciones
+                        <div class="text-center">
+                            Acciones
+                        </div>
+
                     </th>
                 </tr>
                 </thead>
@@ -50,7 +54,7 @@
                     <td th:text="${producto.descripcion}" class="px-6 py-4"></td>
                     <td th:text="${producto.precio}" class="px-6 py-4"></td>
                     <td>
-                        <div class="flex space-x-3  items-center">
+                        <div class="flex space-x-3  items-center justify-center">
                             <a th:href="@{'/products/edit/' + ${producto.id}}"
                                class="bg-amber-500 text-white rounded px-1 py-1 font-bold min-w-16 text-center">Editar</a>
                             <a th:href="@{'/products/show/' + ${producto.id}}"
@@ -109,12 +113,60 @@
             });
         });
     </script>
--
+
     <script>
-        $(document).ready(function() {
-            $('#productosTabla').DataTable({
-            });
+        const table = new DataTable('#productosTabla', {
+            pageLength: 50,
+            scrollY: '600px',
+            language: {
+                url: '/datatables/es-ES.json',
+            },
+            buttons: [
+                {
+                    extend: 'excel',
+                    text: 'Exportar a Excel',
+                },
+                {
+                    extend: 'pdf',
+                    text: 'Exportar a PDF',
+                },
+            ],
+            layout: {
+                topStart: 'buttons'
+            },
+            columnDefs: [
+                {
+                    targets: 2,
+                    visible: false,
+                }
+            ]
         });
+
+        // Ordenando
+        table.order([1, 'asc']).draw();
+
     </script>
+</th:block>
+
+<th:block layout:fragment="styles">
+    <style>
+        .buttons-excel {
+            background-color: green !important;
+            color: white !important;
+            border: none !important;
+            padding: 8px 14px !important;
+            border-radius: 8px !important;
+            font-size: 14px !important;
+        }
+
+        .buttons-pdf {
+            background-color: red !important;
+            color: white !important;
+            border: none !important;
+            padding: 8px 14px !important;
+            border-radius: 8px !important;
+            font-size: 14px !important;
+        }
+    </style>
 </th:block>
 </html>

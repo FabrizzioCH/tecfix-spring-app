@@ -23,4 +23,9 @@ public class MetodoPagoServiceImpl implements MetodoPagoService {
     public Optional<MetodoPago> obtenerPorIdYUsuario(Long id, Long usuarioId) {
         return metodoPagoDao.findByIdAndUsuarioId(id, usuarioId);
     }
+
+    @Override
+    public MetodoPago save(MetodoPago metodoPago) {
+        return metodoPagoDao.save(metodoPago);
+    }
 }

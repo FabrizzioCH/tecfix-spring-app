@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface MetodoPagoService {
     List<MetodoPago> listarMetodoPagoPorUsuario(Long usuarioId);
     Optional<MetodoPago> obtenerPorIdYUsuario(Long id, Long usuarioId);
+    MetodoPago save(MetodoPago metodoPago);
 }

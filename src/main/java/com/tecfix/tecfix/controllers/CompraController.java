@@ -51,57 +51,105 @@ public class CompraController {
 
     @PostMapping("/compra/procesar")
     public String procesarCompra(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                 @RequestParam("direccionSeleccion") String direccionSeleccion,
-                                 @RequestParam("metodoPagoSeleccion") String metodoPagoSeleccion,
+                                 @RequestParam(name = "direccionSeleccion", required = false) String direccionSeleccion,
+                                 @RequestParam(name = "metodoPagoSeleccion", required = false) String metodoPagoSeleccion,
+                                 @RequestParam(name = "calle", required = false) String calle,
+                                 @RequestParam(name = "ciudad", required = false) String ciudad,
+                                 @RequestParam(name = "provincia", required = false) String provincia,
+                                 @RequestParam(name = "cp", required = false) String cp,
+                                 @RequestParam(name = "numero", required = false) String numero,
+                                 @RequestParam(name = "alias", required = false) String alias,
+                                 @RequestParam(name = "referencia", required = false) String referencia,
+                                 @RequestParam(name = "tipoTarjeta", required = false) String tipoTarjeta,
+                                 @RequestParam(name = "numTarjeta", required = false) String numTarjeta,
+                                 @RequestParam(name = "nombreTarjeta", required = false) String nombreTarjeta,
+                                 @RequestParam(name = "expiracion", required = false) String expiracion,
+                                 @RequestParam(name = "cvv", required = false) String cvv,
                                  Model model) {
-        // Convertir a Long y validar que sean IDs numéricos (evita 400 cuando viene "nuevo"/"nueva")
-        Long direccionId;
-        Long metodoPagoId;
+
+        // Determinar dirección final
+        Direccion direccion = null;
         try {
-            direccionId = Long.valueOf(direccionSeleccion);
-            metodoPagoId = Long.valueOf(metodoPagoSeleccion);
-        } catch (NumberFormatException ex) {
-            return "redirect:/compra/fase1?error=seleccion-invalida";
+            if (direccionSeleccion != null && direccionSeleccion.equals("nueva")) {
+                Direccion d = new Direccion();
+                d.setCalle(calle);
+                d.setCiudad(ciudad);
+                d.setEstado(provincia);
+                d.setCodigoPostal(cp);
+                d.setNumero(numero);
+                d.setAlias(alias);
+                d.setReferencia(referencia);
+                d.setUsuario(usuarioService.buscarUsuarioId(userDetails.getId()));
+                direccion = direccionService.save(d);
+            } else if (direccionSeleccion != null) {
+                // intenta parsear id
+                try {
+                    Long idDir = Long.parseLong(direccionSeleccion);
+                    direccion = direccionService.obtenerPorIdYUsuario(idDir, userDetails.getId()).orElse(null);
+                } catch (NumberFormatException nf) {
+                    direccion = null;
+                }
+            }
+
+            // Determinar método de pago final
+            MetodoPago metodoPago = null;
+            if (metodoPagoSeleccion != null && metodoPagoSeleccion.equals("nuevo")) {
+                MetodoPago m = new MetodoPago();
+                m.setTipo(tipoTarjeta != null ? (tipoTarjeta.equals("CREDITO") ? "Tarjeta de crédito" : "Tarjeta de débito") : "Tarjeta");
+                m.setProveedor(null);
+                // Guardamos sólo los últimos 4 dígitos en numeroCuenta por seguridad
+                if (numTarjeta != null) {
+                    String onlyDigits = numTarjeta.replaceAll("\\s+", "");
+                    if (onlyDigits.length() > 4) {
+                        m.setNumeroCuenta(onlyDigits.substring(onlyDigits.length() - 4));
+                    } else {
+                        m.setNumeroCuenta(onlyDigits);
+                    }
+                }
+                m.setFechaExpiracion(expiracion);
+                m.setCodigoSeguridad(cvv);
+                m.setUsuario(usuarioService.buscarUsuarioId(userDetails.getId()));
+                metodoPago = metodoPagoService.save(m);
+            } else if (metodoPagoSeleccion != null) {
+                try {
+                    Long idMp = Long.parseLong(metodoPagoSeleccion);
+                    metodoPago = metodoPagoService.obtenerPorIdYUsuario(idMp, userDetails.getId()).orElse(null);
+                } catch (NumberFormatException nf) {
+                    metodoPago = null;
+                }
+            }
+
+            // Guardar compra
+            Compra compra = new Compra();
+            compra.setUsuario(usuarioService.buscarUsuarioId(userDetails.getId()));
+            compra.setDireccion(direccion);
+            compra.setMetodoPago(metodoPago);
+            compra.setTotal(carritoService.calcularTotalCarrito(carritoService.listarItemsPorUsuario(userDetails.getId())));
+            compra.setEstado("Recibida");
+            compraService.guardarCompraDesdeCarrito(compra);
+
+            // Registrar detalles de la compra
+            List<CarritoItems> itemsList = carritoService.listarItemsPorUsuario(userDetails.getId());
+            for (CarritoItems carritoItems : itemsList) {
+                CompraDetalle detalle = new CompraDetalle();
+                detalle.setCompra(compra);
+                detalle.setProducto(carritoItems.getProducto());
+                detalle.setCantidad(carritoItems.getCantidad());
+
+                productoService.restarStock(carritoItems.getProducto().getId(), carritoItems.getCantidad());
+
+                detalle.setSubtotal(carritoItems.getCantidad()+carritoItems.getProducto().getPrecio().doubleValue());
+                compraDetalleService.save(detalle);
+            }
+
+            carritoService.vaciarCarrito(userDetails.getId());
+
+            return "redirect:/";
+
+        } catch (Exception e) {
+            // Manejo simple de errores: volver a la página con mensaje
+            model.addAttribute("error", "No se pudo procesar la compra: " + e.getMessage());
+            return "fase1-compra";
         }
-
-        // Validar que la dirección y el mét odo de pago pertenezcan al usuario autenticado
-        Optional<Direccion> direccionOpt = direccionService.obtenerPorIdYUsuario(direccionId, userDetails.getId());
-        Optional<MetodoPago> metodoPagoOpt = metodoPagoService.obtenerPorIdYUsuario(metodoPagoId, userDetails.getId());
-
-        if (direccionOpt.isEmpty() || metodoPagoOpt.isEmpty()) {
-            // Selección inválida o no pertenecen al usuario
-            return "redirect:/compra/fase1?error=seleccion-invalida";
-        }
-
-        Direccion direccion = direccionOpt.get();
-        MetodoPago metodoPago = metodoPagoOpt.get();
-
-//        RegistrarCompra
-        Compra compra = new Compra();
-        compra.setUsuario(usuarioService.buscarUsuarioId(userDetails.getId()));
-        compra.setDireccion(direccion);
-        compra.setMetodoPago(metodoPago);
-        compra.setTotal(carritoService.calcularTotalCarrito(carritoService.listarItemsPorUsuario(userDetails.getId())));
-        compra.setEstado("Recibida");
-        compraService.guardarCompraDesdeCarrito(compra);
-
-//        RegistrarDetalles de la compra
-        List<CarritoItems> itemsList = carritoService.listarItemsPorUsuario(userDetails.getId());
-        for (CarritoItems carritoItems : itemsList) {
-            CompraDetalle detalle = new CompraDetalle();
-            detalle.setCompra(compra);
-            detalle.setProducto(carritoItems.getProducto());
-            detalle.setCantidad(carritoItems.getCantidad());
-
-            productoService.restarStock(carritoItems.getProducto().getId(), carritoItems.getCantidad());
-
-            detalle.setPrecioUnitario(carritoItems.getProducto().getPrecio().doubleValue());
-            detalle.setSubtotal(carritoItems.getCantidad()+carritoItems.getProducto().getPrecio().doubleValue());
-            compraDetalleService.save(detalle);
-        }
-
-        carritoService.vaciarCarrito(userDetails.getId());
-
-        return "redirect:/";
     }
 }

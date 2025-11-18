@@ -47,9 +47,6 @@ public class Producto {
     @Column(nullable = false)
     private boolean disponible = true;
 
-    @Column(name = "duracion_horas")
-    private Integer duracionHoras;
-
     @Column(name = "creado_en", updatable = false)
     private LocalDateTime creadoEn;
 

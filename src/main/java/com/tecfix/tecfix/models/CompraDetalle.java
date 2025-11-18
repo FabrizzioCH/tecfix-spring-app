@@ -24,7 +24,6 @@ public class CompraDetalle {
     private Long id;
 
     int cantidad;
-    double precioUnitario;
     double subtotal;
 
     @ManyToOne(fetch = FetchType.LAZY)

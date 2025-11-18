@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class Compra {
     // Indica que es la llave primaria y que se genera automaticamente
     private Long id;
 
-    private LocalDate fecha;
+    private LocalDateTime fecha;
     private String estado;
     private Double total;
 
@@ -48,6 +49,6 @@ public class Compra {
 
     @PrePersist
     protected void OnCreate() {
-        this.fecha = LocalDate.now();
+        this.fecha = LocalDateTime.now();
     }
 }

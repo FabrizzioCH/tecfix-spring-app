@@ -23,4 +23,9 @@ public class DireccionServiceImpl  implements DireccionService {
     public Optional<Direccion> obtenerPorIdYUsuario(Long id, Long usuarioId) {
         return direccionDao.findByIdAndUsuarioId(id, usuarioId);
     }
+
+    @Override
+    public Direccion save(Direccion direccion) {
+        return direccionDao.save(direccion);
+    }
 }

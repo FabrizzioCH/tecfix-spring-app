@@ -8,10 +8,8 @@
 <main layout:fragment="content">
     <h1 class="text-6xl text-white mb-6">Compra</h1>
 
-    <!-- Formulario de dirección y método de pago -->
+    <!-- Formulario de dirección y méto do de pago -->
     <form method="post" class="space-y-8 max-w-3xl" id="checkoutForm" th:action="@{/compra/procesar}">
-        <!-- CSRF (si está habilitado en Spring Security) -->
-        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
         <!-- Dirección de envío -->
         <fieldset class="border border-gray-700 p-6 rounded-md bg-gray-800/40">
@@ -21,6 +19,7 @@
             <div class="space-y-3 mt-4">
                 <p class="text-sm text-gray-300" th:if="${direcciones == null || #lists.isEmpty(direcciones)}">No tienes
                     direcciones guardadas. Agrega una nueva:</p>
+
                 <div th:if="${direcciones != null && !#lists.isEmpty(direcciones)}" class="space-y-2">
 
                     <p class="text-sm text-gray-300">Selecciona una dirección guardada o crea una nueva:</p>
@@ -90,7 +89,7 @@
             </div>
         </fieldset>
 
-        <!-- Método de pago -->
+        <!-- Mét odo de pago -->
         <fieldset class="border border-gray-700 p-6 rounded-md bg-gray-800/40">
             <legend class="text-xl font-semibold text-white px-2">Método de pago</legend>
 
@@ -116,7 +115,7 @@
                 </div>
             </div>
 
-            <!-- Formulario nuevo método -->
+            <!-- Formulario nuevo mét odo -->
             <div id="nuevoMetodoPagoFields" class="mt-4 space-y-4"
                  th:classappend="${metodosPago != null && !#lists.isEmpty(metodosPago)} ? 'hidden' : ''">
                 <div class="grid md:grid-cols-3 gap-4">
@@ -234,15 +233,142 @@
 
             metodoOptions.forEach(opt => opt.addEventListener('change', toggleMetodo));
 
-            // Intercept submit: por ahora solo permitimos seleccionar existentes
+            // Auto-select radio if user starts typing in the "new" fields
+            function attachAutoSelect(fieldsContainer, radioSelector, toggleFn) {
+                if (!fieldsContainer) return;
+                const controls = fieldsContainer.querySelectorAll('input, textarea, select');
+                controls.forEach(c => {
+                    c.addEventListener('input', () => {
+                        // if any control has a non-empty value, check the radio and ensure visibility
+                        let any = false;
+                        for (let i = 0; i < controls.length; i++) {
+                            const v = controls[i].value;
+                            if (v !== null && v.toString().trim() !== '') {
+                                any = true;
+                                break;
+                            }
+                        }
+                        const radio = document.querySelector(radioSelector);
+                        if (any) {
+                            if (radio) radio.checked = true;
+                            if (typeof toggleFn === 'function') toggleFn();
+                        } else {
+                            // if all cleared, uncheck the radio (but only if there are saved options)
+                            if (radio && document.querySelectorAll('.direccion-option, .metodo-pago-option').length > 0) {
+                                radio.checked = false;
+                                if (typeof toggleFn === 'function') toggleFn();
+                            }
+                        }
+                    });
+                });
+            }
+
+            attachAutoSelect(nuevaDirFields, 'input[name="direccionSeleccion"][value="nueva"]', toggleDireccion);
+            attachAutoSelect(nuevoMetodoFields, 'input[name="metodoPagoSeleccion"][value="nuevo"]', toggleMetodo);
+
+            // Intercept submit: por ahora permitimos seleccionar existentes o crear nuevos (validando campos nuevos)
             const form = document.getElementById('checkoutForm');
             form.addEventListener('submit', function (e) {
                 const dirSel = document.querySelector('input[name="direccionSeleccion"]:checked');
                 const mpSel = document.querySelector('input[name="metodoPagoSeleccion"]:checked');
-                const invalid = !dirSel || isNaN(Number(dirSel.value)) || !mpSel || isNaN(Number(mpSel.value));
-                if (invalid) {
+
+                // helper: validate all form controls inside a container (returns true if all valid)
+                function validateFields(container) {
+                    if (!container) return true; // nothing to validate
+                    const controls = container.querySelectorAll('input, textarea, select');
+                    for (let i = 0; i < controls.length; i++) {
+                        const el = controls[i];
+                        // Only validate controls that are required or have a value (avoid optional hidden inputs)
+                        if (!el.checkValidity()) {
+                            // show browser validation UI on first invalid control
+                            el.reportValidity();
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+
+                function validateSelection(sel, newValue, fieldsContainer) {
+                    if (sel) {
+                        if (sel.value === newValue) {
+                            // user chose to create a new one -> validate its fields
+                            if (!validateFields(fieldsContainer)) return false;
+                            return true;
+                        } else {
+                            // existing selection: value must be a numeric id
+                            // However, if the new-fields container is visible and the user filled any value
+                            // we consider they intended to create a new one even if they didn't click the radio.
+                            if (fieldsContainer && !fieldsContainer.classList.contains('hidden')) {
+                                const inputs = fieldsContainer.querySelectorAll('input, textarea, select');
+                                let anyValue = false;
+                                for (let i = 0; i < inputs.length; i++) {
+                                    const v = inputs[i].value;
+                                    if (v !== null && v.toString().trim() !== '') {
+                                        anyValue = true;
+                                        break;
+                                    }
+                                }
+                                if (anyValue) {
+                                    return validateFields(fieldsContainer);
+                                }
+                            }
+                            return !isNaN(Number(sel.value));
+                        }
+                    } else {
+                        // no radio selected: if new-fields are visible, validate them (user may not have elegido el radio pero llenó el formulario)
+                        if (fieldsContainer && !fieldsContainer.classList.contains('hidden')) {
+                            return validateFields(fieldsContainer);
+                        }
+                        return false;
+                    }
+                }
+
+                const dirOk = validateSelection(dirSel, 'nueva', nuevaDirFields);
+                const mpOk = validateSelection(mpSel, 'nuevo', nuevoMetodoFields);
+
+                // If the user filled the "new" form but didn't explicitly select the corresponding radio,
+                // set the radio (or a hidden input) so the server receives the intent to create a new item.
+                function ensureSelectionIfFilled(sel, newValue, fieldsContainer, radioSelector, hiddenName) {
+                    // if already selected correctly, nothing to do
+                    if (sel && sel.value === newValue) return;
+
+                    if (fieldsContainer && !fieldsContainer.classList.contains('hidden')) {
+                        const inputs = fieldsContainer.querySelectorAll('input, textarea, select');
+                        let anyValue = false;
+                        for (let i = 0; i < inputs.length; i++) {
+                            const v = inputs[i].value;
+                            if (v !== null && v.toString().trim() !== '') {
+                                anyValue = true;
+                                break;
+                            }
+                        }
+                        if (anyValue) {
+                            // try to find the radio and check it
+                            const radio = document.querySelector(radioSelector);
+                            if (radio) {
+                                radio.checked = true;
+                            } else {
+                                // fallback: add or update a hidden input so server gets the value
+                                let hidden = document.querySelector('input[name="' + hiddenName + '"][type="hidden"]');
+                                if (!hidden) {
+                                    hidden = document.createElement('input');
+                                    hidden.type = 'hidden';
+                                    hidden.name = hiddenName;
+                                    document.getElementById('checkoutForm').appendChild(hidden);
+                                }
+                                hidden.value = newValue;
+                            }
+                        }
+                    }
+                }
+
+                // Ensure the selection reflects filled forms (before final submit)
+                ensureSelectionIfFilled(dirSel, 'nueva', nuevaDirFields, 'input[name="direccionSeleccion"][value="nueva"]', 'direccionSeleccion');
+                ensureSelectionIfFilled(mpSel, 'nuevo', nuevoMetodoFields, 'input[name="metodoPagoSeleccion"][value="nuevo"]', 'metodoPagoSeleccion');
+
+                if (!dirOk || !mpOk) {
                     e.preventDefault();
-                    alert('Por ahora debes seleccionar una dirección y un método de pago guardados.');
+                    alert('Por favor selecciona una dirección y un método de pago válidos. Si eliges crear uno nuevo, completa los campos requeridos.');
                 }
             });
 

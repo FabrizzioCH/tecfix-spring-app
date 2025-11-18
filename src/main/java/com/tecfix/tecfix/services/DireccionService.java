@@ -9,4 +9,5 @@ public interface DireccionService {
 
     List<Direccion> listarDireccionesPorUsuario(Long usuarioId);
     Optional<Direccion> obtenerPorIdYUsuario(Long id, Long usuarioId);
+    Direccion save(Direccion direccion); // Guarda una dirección (nueva o actualizada)
 }
