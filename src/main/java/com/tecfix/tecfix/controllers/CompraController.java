@@ -138,7 +138,9 @@ public class CompraController {
 
                 productoService.restarStock(carritoItems.getProducto().getId(), carritoItems.getCantidad());
 
-                detalle.setSubtotal(carritoItems.getCantidad()+carritoItems.getProducto().getPrecio().doubleValue());
+                // Fix: subtotal should be cantidad * precio
+                double precio = carritoItems.getProducto().getPrecio().doubleValue();
+                detalle.setSubtotal(carritoItems.getCantidad() * precio);
                 compraDetalleService.save(detalle);
             }
 

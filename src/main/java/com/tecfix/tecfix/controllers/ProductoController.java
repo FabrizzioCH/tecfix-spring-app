@@ -6,6 +6,7 @@ import com.tecfix.tecfix.security.CustomUsuarioDetailService;
 import com.tecfix.tecfix.services.ProductoService;
 import com.tecfix.tecfix.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -93,6 +94,7 @@ public class ProductoController {
     }
 
     @GetMapping("products/charts")
+    @PreAuthorize("hasRole('ADMIN')")
     public String showChart(){
         return "admin/charts";
     }

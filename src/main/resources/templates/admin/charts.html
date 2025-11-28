@@ -10,11 +10,42 @@
 
     <section class="my-16 text-white">
         <h2 class="text-white text-5xl">Estadísticas</h2>
-        <div class="flex items-center justify-center">
-            <div id="chart_div" class="mt-8"></div>
+
+        <div class="flex gap-4 items-end mt-6">
+            <div>
+                <label class="block text-sm">Desde</label>
+                <input type="date" id="startDate" class="text-black px-2 py-1 rounded" />
+            </div>
+            <div>
+                <label class="block text-sm">Hasta</label>
+                <input type="date" id="endDate" class="text-black px-2 py-1 rounded" />
+            </div>
+            <button id="applyFilters" class="bg-blue-600 px-3 py-2 rounded">Aplicar</button>
+            <button id="clearFilters" class="bg-gray-600 px-3 py-2 rounded">Limpiar</button>
         </div>
 
-
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+            <div>
+                <h3 class="text-xl mb-2">Ventas por mes</h3>
+                <div id="ventas_mes_chart"></div>
+            </div>
+            <div>
+                <h3 class="text-xl mb-2">Productos vendidos por mes</h3>
+                <div id="productos_mes_chart"></div>
+            </div>
+            <div>
+                <h3 class="text-xl mb-2">Productos por categoría</h3>
+                <div id="categoria_chart"></div>
+            </div>
+            <div>
+                <h3 class="text-xl mb-2">Ventas por usuario</h3>
+                <div id="usuarios_chart"></div>
+            </div>
+            <div class="md:col-span-2">
+                <h3 class="text-xl mb-2">Proyección de ventas (6 meses)</h3>
+                <div id="proyeccion_chart"></div>
+            </div>
+        </div>
     </section>
 
 </main>
@@ -22,37 +53,105 @@
 <th:block layout:fragment="scripts">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
+        google.charts.load('current', {'packages':['corechart','bar','line']});
+        google.charts.setOnLoadCallback(initCharts);
 
-        // Load the Visualization API and the corechart package.
-        google.charts.load('current', {'packages':['corechart']});
+        const startInput = document.getElementById('startDate');
+        const endInput = document.getElementById('endDate');
+        document.getElementById('applyFilters').addEventListener('click', initCharts);
+        document.getElementById('clearFilters').addEventListener('click', () => {
+            startInput.value = '';
+            endInput.value = '';
+            initCharts();
+        });
 
-        // Set a callback to run when the Google Visualization API is loaded.
-        google.charts.setOnLoadCallback(drawChart);
+        function buildQS(){
+            const params = new URLSearchParams();
+            if(startInput.value) params.set('start', startInput.value);
+            if(endInput.value) params.set('end', endInput.value);
+            const qs = params.toString();
+            return qs ? ('?' + qs) : '';
+        }
 
-        // Callback that creates and populates a data table,
-        // instantiates the pie chart, passes in the data and
-        // draws it.
-        function drawChart() {
+        async function fetchJson(url){
+            const res = await fetch(url, {headers: { 'Accept': 'application/json' }});
+            if(!res.ok) throw new Error('HTTP '+res.status);
+            return res.json();
+        }
 
-            // Create the data table.
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Topping');
-            data.addColumn('number', 'Slices');
-            data.addRows([
-                ['Mushrooms', 3],
-                ['Onions', 1],
-                ['Olives', 1],
-                ['Zucchini', 1],
-                ['Pepperoni', 2]
-            ]);
+        function monthLabel(y, m){
+            const d = new Date(y, m-1, 1);
+            return d.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
+        }
 
-            // Set chart options
-            var options = {'title':'How Much Pizza I Ate Last Night',
-                'width':400,
-                'height':300};
+        async function initCharts(){
+            try{
+                const qs = buildQS();
+                const [ventasMes, productosMes, porCategoria, porUsuario, proyeccion] = await Promise.all([
+                    fetchJson('/api/stats/ventas-por-mes' + qs),
+                    fetchJson('/api/stats/productos-vendidos-por-mes' + qs),
+                    fetchJson('/api/stats/productos-por-categoria' + qs),
+                    fetchJson('/api/stats/ventas-por-usuario' + qs),
+                    fetchJson('/api/stats/proyeccion-ventas?meses=6' + (qs ? ('&' + qs.substring(1)) : ''))
+                ]);
 
-            // Instantiate and draw our chart, passing in some options.
-            var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+                drawVentasMes(ventasMes);
+                drawProductosMes(productosMes);
+                drawPorCategoria(porCategoria);
+                drawPorUsuario(porUsuario);
+                drawProyeccion(proyeccion);
+            }catch(e){
+                console.error('Error cargando estadísticas', e);
+            }
+        }
+
+        function drawVentasMes(rows){
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'Mes');
+            data.addColumn('number', 'Ventas');
+            data.addRows(rows.map(r => [monthLabel(r.year, r.month), r.amount]));
+            const options = { title: 'Ventas por mes', legend: { position: 'none' }, height: 300 };
+            const chart = new google.visualization.ColumnChart(document.getElementById('ventas_mes_chart'));
+            chart.draw(data, options);
+        }
+
+        function drawProductosMes(rows){
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'Mes');
+            data.addColumn('number', 'Unidades');
+            data.addRows(rows.map(r => [monthLabel(r.year, r.month), Number(r.count)]));
+            const options = { title: 'Productos vendidos por mes', legend: { position: 'none' }, height: 300 };
+            const chart = new google.visualization.AreaChart(document.getElementById('productos_mes_chart'));
+            chart.draw(data, options);
+        }
+
+        function drawPorCategoria(rows){
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'Categoría');
+            data.addColumn('number', 'Unidades');
+            data.addRows(rows.map(r => [r.category || 'Sin categoría', Number(r.count)]));
+            const options = { title: 'Productos por categoría', height: 300 };
+            const chart = new google.visualization.PieChart(document.getElementById('categoria_chart'));
+            chart.draw(data, options);
+        }
+
+        function drawPorUsuario(rows){
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'Usuario');
+            data.addColumn('number', 'Ventas');
+            data.addRows(rows.map(r => [r.userName || ('ID '+r.userId), r.amount]));
+            const options = { title: 'Ventas por usuario', legend: { position: 'none' }, height: 300 };
+            const chart = new google.visualization.BarChart(document.getElementById('usuarios_chart'));
+            chart.draw(data, options);
+        }
+
+        function drawProyeccion(rows){
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'Mes');
+            data.addColumn('number', 'Pronóstico');
+            data.addRows(rows.map(r => [monthLabel(r.year, r.month), r.amount]));
+            const options = { title: 'Proyección de ventas', legend: { position: 'none' }, height: 300 };
+            const chart = new google.visualization.LineChart(document.getElementById('proyeccion_chart'));
             chart.draw(data, options);
         }
     </script>
@@ -60,23 +159,8 @@
 
 <th:block layout:fragment="styles">
     <style>
-        .buttons-excel {
-            background-color: green !important;
-            color: white !important;
-            border: none !important;
-            padding: 8px 14px !important;
-            border-radius: 8px !important;
-            font-size: 14px !important;
-        }
-
-        .buttons-pdf {
-            background-color: red !important;
-            color: white !important;
-            border: none !important;
-            padding: 8px 14px !important;
-            border-radius: 8px !important;
-            font-size: 14px !important;
-        }
+        .buttons-excel { background-color: green !important; color: white !important; border: none !important; padding: 8px 14px !important; border-radius: 8px !important; font-size: 14px !important; }
+        .buttons-pdf { background-color: red !important; color: white !important; border: none !important; padding: 8px 14px !important; border-radius: 8px !important; font-size: 14px !important; }
     </style>
 </th:block>
 </html>
